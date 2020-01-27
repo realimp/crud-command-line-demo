@@ -16,6 +16,7 @@ public class Employee {
     @Column(name = "birth_date")
     private Date birthDate;
 
+    @Column(name = "employee_position")
     private String position;
 
     @Column(name = "date_hired")
