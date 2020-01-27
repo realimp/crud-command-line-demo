@@ -9,7 +9,7 @@ import java.util.Scanner;
 @SpringBootApplication
 public class CrudCommandLineDemoApplication implements CommandLineRunner {
 
-	private static final String[] COMMANDS = new String[] {"CREATE", "DELETE", "FIND", "FIRE", "LIST", "RENAME"};
+	private static final String[] COMMANDS = new String[] {"CREATE", "DELETE", "FIND", "FIRE", "HIRE", "HELP", "LIST", "RENAME"};
 
 	public static void main(String[] args) {
 		SpringApplication.run(CrudCommandLineDemoApplication.class, args);
@@ -18,7 +18,7 @@ public class CrudCommandLineDemoApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 
-		System.out.println("Добро пожаловать!\n " +
+		System.out.println("Добро пожаловать!\n" +
 				"Ниже представлен список доступных команд");
 		printHelp();
 
@@ -69,13 +69,13 @@ public class CrudCommandLineDemoApplication implements CommandLineRunner {
 
 	private static void printHelp(){
 		System.out.println(
-				"CREATE название отдела - создает новый отдел компании\n" +
-				"DELETE название отдела - удаляет отдел компании\n" +
-				"FIND имя сотрудника - поиск сотрудников по имени\n" +
-				"FIRE id сотрудника - удалить сотрудника\n" +
-				"HIRE название отдела - нанять сотрудника в отдел\n" +
-				"HELP - отображает сообщение с описанием команд\n" +
-				"LIST название отдела - показать список сотрудников отдела\n" +
-				"RENAME старое название отдела: новое название отдела - переименовать отдел");
+				"\tCREATE название отдела - создает новый отдел компании\n" +
+				"\tDELETE название отдела - удаляет отдел компании\n" +
+				"\tFIND имя сотрудника - поиск сотрудников по имени\n" +
+				"\tFIRE id сотрудника - удалить сотрудника\n" +
+				"\tHIRE название отдела - нанять сотрудника в отдел\n" +
+				"\tHELP - отображает сообщение с описанием команд\n" +
+				"\tLIST название отдела - показать список сотрудников отдела\n" +
+				"\tRENAME старое название отдела: новое название отдела - переименовать отдел");
 	}
 }

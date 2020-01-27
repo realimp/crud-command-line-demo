@@ -6,5 +6,5 @@ import pro.nikolaev.crudcommandlinedemo.entities.Department;
 
 @Repository
 public interface DepartmentRepository extends JpaRepository<Department, Integer> {
-    Department findByName();
+    Department findByName(String name);
 }
