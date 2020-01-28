@@ -1,8 +1,11 @@
 package pro.nikolaev.crudcommandlinedemo;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import pro.nikolaev.crudcommandlinedemo.services.DepartmentService;
+import pro.nikolaev.crudcommandlinedemo.services.EmployeeService;
 
 import java.util.Scanner;
 
@@ -11,9 +14,17 @@ public class CrudCommandLineDemoApplication implements CommandLineRunner {
 
 	private static final String[] COMMANDS = new String[] {"CREATE", "DELETE", "FIND", "FIRE", "HIRE", "HELP", "LIST", "RENAME"};
 
+	@Autowired
+	private DepartmentService departmentService;
+
+	@Autowired
+	private EmployeeService employeeService;
+
 	public static void main(String[] args) {
 		SpringApplication.run(CrudCommandLineDemoApplication.class, args);
 	}
+
+	public static Scanner scanner = new Scanner(System.in);
 
 	@Override
 	public void run(String... args) throws Exception {
@@ -22,35 +33,36 @@ public class CrudCommandLineDemoApplication implements CommandLineRunner {
 				"Ниже представлен список доступных команд");
 		printHelp();
 
-		Scanner scanner = new Scanner(System.in);
+		//Scanner scanner = new Scanner(System.in);
 		while (true) {
 			String userInput = scanner.nextLine().trim();
 			if (checkCommandInput(userInput)) {
 				String command = userInput.contains(" ") ? userInput.substring(0, userInput.indexOf(" ")) : userInput;
+				String commandParameter = userInput.replace(command, "").trim();
 				switch (command.toUpperCase()) {
 					case "CREATE":
-						// ToDo implement method in DepartmentService
+						System.out.println(departmentService.createDepartment(commandParameter, scanner));
 						break;
 					case "DELETE":
-						// ToDo implement method in DepartmentService
+						System.out.println(departmentService.deleteDepartment(commandParameter, scanner));
 						break;
 					case "FIND":
-						// ToDo implement method in EmployeeService
+						employeeService.findEmployee(commandParameter, scanner);
 						break;
 					case "FIRE":
-						// ToDo implement method in EmployeeService
+						employeeService.fireEmployee(commandParameter);
 						break;
 					case "HIRE":
-						// ToDo implement method in EmployeeService
+						employeeService.hireEmployee(commandParameter, scanner);
 						break;
 					case "HELP":
 						printHelp();
 						break;
 					case "LIST":
-						// ToDo implement method in EmployeeService
+						employeeService.listEmployeesByDepartment(commandParameter);
 						break;
 					case "RENAME":
-						// ToDo implement method in DepartmentService
+						System.out.println(departmentService.renameDepartment(commandParameter));
 						break;
 				}
 			}
@@ -64,6 +76,7 @@ public class CrudCommandLineDemoApplication implements CommandLineRunner {
 				return true;
 			}
 		}
+		System.out.println("Команда " + command.toUpperCase() + " отсутствует! Введите HELP для просмтра списка команд.");
 		return false;
 	}
 
