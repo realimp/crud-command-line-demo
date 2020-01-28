@@ -33,62 +33,61 @@ public class DepartmentService {
         Department savedDepartment = departmentRepository.saveAndFlush(department);
         Employee departmentHead;
         System.out.println("Введите id руководителя или HIRE, чтобы создать нового сотрудника");
+        String userInput;
         while (true) {
-            String userInput = scanner.nextLine();
-            if (userInput == null) {
-                return "Invalid input!";
-            }
-            if (userInput.trim().equalsIgnoreCase("HIRE")) {
-                departmentHead = employeeService.hireEmployee(name, scanner);
-            } else if (numericPattern.matcher(userInput.trim()).matches()) {
-                Optional<Employee> employee = employeeRepository.findById(Integer.valueOf(userInput.trim()));
-                if (employee != null) {
-                    departmentHead = employee.get();
-                } else {
-                    return "Invalid input!";
+            userInput = scanner.nextLine();
+            if (userInput != null) {
+                if (userInput.trim().equalsIgnoreCase("HIRE")) {
+                    departmentHead = employeeService.hireEmployee(name, scanner);
+                    savedDepartment.setDepartmentHead(departmentHead);
+                    departmentRepository.saveAndFlush(savedDepartment);
+                    return "Отдел " + name + " успешно создан.\nРуководитель отдела - " + departmentHead.getName();
+                } else if (numericPattern.matcher(userInput.trim()).matches()) {
+                    Optional<Employee> employee = employeeRepository.findById(Integer.valueOf(userInput.trim()));
+                    if (employee.isPresent()) {
+                        departmentHead = employee.get();
+                        savedDepartment.setDepartmentHead(departmentHead);
+                        departmentRepository.saveAndFlush(savedDepartment);
+                        return "Отдел " + name + " успешно создан.\nРуководитель отдела - " + departmentHead.getName();
+                    }
                 }
-            } else {
-                return "Invalid input";
+                System.out.println("Неверный ввод данных! Повторите попытку.");
             }
-
-            savedDepartment.setDepartmentHead(departmentHead);
-            departmentRepository.saveAndFlush(savedDepartment);
-
-            return "Отдел " + name + " успешно создан.\nРуководитель отдела - " + departmentHead.getName();
         }
     }
 
     public String renameDepartment(String args) {
         if (!args.contains(":")) {
-            return "Invalid input!";
+            return "Неверный ввод данных! Повторите попытку.";
         }
         String[] names = args.split(":");
         if (names.length != 2) {
-            return "Invalid input!";
+            return "Неверный ввод данных! Повторите попытку.";
         }
-        Optional<Department> optionalDepartment = departmentRepository.findByName(names[0]);
-        if (optionalDepartment != null) {
+        Optional<Department> optionalDepartment = departmentRepository.findByName(names[0].trim());
+        if (optionalDepartment.isPresent()) {
             Department department = optionalDepartment.get();
-            department.setName(names[1]);
+            department.setName(names[1].trim());
             departmentRepository.saveAndFlush(department);
+            return "Отдел " + names[0].trim() + " успешно переименован в " + names[1].trim();
         }
-        return "Отдел " + names[0] + " успешно переименован в " + names[1];
+        return "Неверный ввод данных! Повторите попытку.";
     }
 
     public String deleteDepartment(String name, Scanner scanner) {
         Optional<Department> departmentToDelete = departmentRepository.findByName(name.trim());
-        if (departmentToDelete != null) {
+        if (departmentToDelete.isPresent()) {
             System.out.println("При удалении отдела все сотрудники этого отдела будут уволены!\n" +
-                    "Вы уверены что хотите удалить отдел " + name + "? (Yes/No");
+                    "Вы уверены что хотите удалить отдел " + name + "? (Yes/No)");
             String userInput = scanner.nextLine();
             if (userInput.trim().equalsIgnoreCase("Y") || userInput.trim().equalsIgnoreCase("YES")) {
                 int employeesDeleted = departmentToDelete.get().getEmployees().size();
                 departmentRepository.delete(departmentToDelete.get());
-                return "Отдел " + name.trim() + "удален. Также удалено " + employeesDeleted + " сотрудников!";
+                return "Отдел " + name.trim() + " удален. Также удалено " + employeesDeleted + " сотрудников!";
             } else {
                 return "Отдел " + name.trim() + " не был удален";
             }
         }
-        return "Invalid input!";
+        return "Неверный ввод данных! Повторите попытку.";
     }
 }

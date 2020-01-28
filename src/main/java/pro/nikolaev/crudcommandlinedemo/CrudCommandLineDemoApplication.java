@@ -47,7 +47,7 @@ public class CrudCommandLineDemoApplication implements CommandLineRunner {
 						System.out.println(departmentService.deleteDepartment(commandParameter, scanner));
 						break;
 					case "FIND":
-						employeeService.findEmployee(commandParameter);
+						employeeService.findEmployee(commandParameter, scanner);
 						break;
 					case "FIRE":
 						employeeService.fireEmployee(commandParameter);
@@ -76,6 +76,7 @@ public class CrudCommandLineDemoApplication implements CommandLineRunner {
 				return true;
 			}
 		}
+		System.out.println("Команда " + command.toUpperCase() + " отсутствует! Введите HELP для просмтра списка команд.");
 		return false;
 	}
 
