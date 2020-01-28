@@ -11,7 +11,7 @@ PRIMARY KEY (id)
 CREATE TABLE IF NOT EXISTS departments (
 id INTEGER AUTO_INCREMENT,
 name VARCHAR(55) NOT NULL,
-department_head INTEGER NOT NULL,
+department_head INTEGER,
 PRIMARY KEY (id),
 KEY department_head (department_head),
 CONSTRAINT departments_ibfk_1 FOREIGN KEY (department_head) REFERENCES employees(id)
