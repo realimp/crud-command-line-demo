@@ -52,7 +52,7 @@ public class CustomCommandLineRunner implements CommandLineRunner {
                         employeeService.findEmployee(commandParameter.trim());
                         break;
                     case "FIRE":
-                        employeeService.fireEmployee(commandParameter.trim());
+                        System.out.println(employeeService.fireEmployee(commandParameter.trim()));
                         break;
                     case "HIRE":
                         employeeService.hireEmployee(getNewEmployeeData(commandParameter, scanner));

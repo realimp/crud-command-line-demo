@@ -46,41 +46,42 @@ public class EmployeeService {
         return null;
     }
 
-    public void findEmployee(String name) {
+    public List<Employee> findEmployee(String name) {
         List<Employee> employees = employeeRepository.findByName(name);
         if (employees.size() > 0) {
             employees.stream().forEach(employee -> System.out.println(EmployeeMapper.getMapping(employee)));
         } else {
             System.out.println("Сотрудников не найдено");
         }
+        return employees;
     }
 
-    public void fireEmployee(String id) {
+    public String fireEmployee(String id) {
         if (numericPattern.matcher(id).matches()) {
             Optional<Employee> employeeToFire = employeeRepository.findById(Integer.valueOf(id));
             if (employeeToFire.isPresent()) {
                 employeeRepository.delete(employeeToFire.get());
-                System.out.println("Сотрудник уволен.");
-            } else {
-                System.out.println("Сотрудник с таким ID не найден!");
+                return "Сотрудник уволен.";
             }
-        } else {
-            System.out.println("Неверный ввод данных! Повторите попытку.");
+            return "Сотрудник с таким ID не найден!";
         }
+        return "Неверный ввод данных! Повторите попытку.";
     }
 
-    public void listEmployeesByDepartment(String departmentName) {
+    public List<Employee> listEmployeesByDepartment(String departmentName) {
         Optional<Department> department = departmentRepository.findByName(departmentName);
         if (department.isPresent()) {
-            if (department.get().getEmployees().size() > 0) {
-                employeeRepository.findByDepartmentId(department.get().getId()).stream()
-                        .forEach(employee -> System.out.println(EmployeeMapper.getMapping(employee)));
+            List<Employee> employees = department.get().getEmployees();
+            if (employees.size() > 0) {
+                employees.stream().forEach(employee -> System.out.println(EmployeeMapper.getMapping(employee)));
+                return employees;
             } else {
                 System.out.println("В этом отделе нет сотрудников!");
             }
         } else {
             System.out.println("Такой отдел не найден!");
         }
+        return null;
     }
 
     public boolean employeeExists(int id) {

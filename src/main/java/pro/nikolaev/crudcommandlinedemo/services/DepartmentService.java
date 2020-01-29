@@ -74,7 +74,10 @@ public class DepartmentService {
 
     public String deleteDepartment(String name) {
         Department departmentToDelete = departmentRepository.findByName(name).get();
-        int employeesDeleted = departmentToDelete.getEmployees().size();
+        int employeesDeleted = 0;
+        if (departmentToDelete.getEmployees() != null) {
+             employeesDeleted = departmentToDelete.getEmployees().size();
+        }
         departmentRepository.delete(departmentToDelete);
         return "Отдел " + name.trim() + " удален. Также удалено " + employeesDeleted + " сотрудников!";
     }
