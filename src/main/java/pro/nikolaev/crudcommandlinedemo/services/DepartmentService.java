@@ -8,9 +8,10 @@ import pro.nikolaev.crudcommandlinedemo.entities.Employee;
 import pro.nikolaev.crudcommandlinedemo.repositories.DepartmentRepository;
 import pro.nikolaev.crudcommandlinedemo.repositories.EmployeeRepository;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Optional;
-import java.util.Scanner;
-import java.util.regex.Pattern;
 
 @Service
 @Transactional
@@ -25,35 +26,32 @@ public class DepartmentService {
     @Autowired
     private EmployeeRepository employeeRepository;
 
-    private Pattern numericPattern = Pattern.compile("\\d+");
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 
-    public String createDepartment(String name, Scanner scanner) {
-        Department department = new Department();
-        department.setName(name);
-        Department savedDepartment = departmentRepository.saveAndFlush(department);
-        Employee departmentHead;
-        System.out.println("Введите id руководителя или HIRE, чтобы создать нового сотрудника");
-        String userInput;
-        while (true) {
-            userInput = scanner.nextLine();
-            if (userInput != null) {
-                if (userInput.trim().equalsIgnoreCase("HIRE")) {
-                    departmentHead = employeeService.hireEmployee(name, scanner);
-                    savedDepartment.setDepartmentHead(departmentHead);
-                    departmentRepository.saveAndFlush(savedDepartment);
-                    return "Отдел " + name + " успешно создан.\nРуководитель отдела - " + departmentHead.getName();
-                } else if (numericPattern.matcher(userInput.trim()).matches()) {
-                    Optional<Employee> employee = employeeRepository.findById(Integer.valueOf(userInput.trim()));
-                    if (employee.isPresent()) {
-                        departmentHead = employee.get();
-                        savedDepartment.setDepartmentHead(departmentHead);
-                        departmentRepository.saveAndFlush(savedDepartment);
-                        return "Отдел " + name + " успешно создан.\nРуководитель отдела - " + departmentHead.getName();
-                    }
-                }
-                System.out.println("Неверный ввод данных! Повторите попытку.");
-            }
+    public String createDepartment(String[] args) throws ParseException {
+        if (args != null && args.length == 2) {
+            Department department = new Department();
+            department.setName(args[0]);
+            Employee departmentHead = employeeRepository.findById(Integer.valueOf(args[1])).get();
+            department.setDepartmentHead(departmentHead);
+            departmentRepository.saveAndFlush(department);
+            return "Отдел " + args[0] + " успешно создан.\nРуководитель отдела - " + departmentHead.getName();
         }
+        if (args != null && args.length == 4) {
+            Department department = new Department();
+            department.setName(args[0]);
+            Department savedDepartment = departmentRepository.saveAndFlush(department);
+            Employee employee = new Employee();
+            employee.setName(args[1]);
+            employee.setBirthDate(dateFormat.parse(args[2]));
+            employee.setHiredDate(new Date());
+            employee.setDepartment(savedDepartment);
+            employee.setPosition(args[3]);
+            savedDepartment.setDepartmentHead(employeeRepository.saveAndFlush(employee));
+            departmentRepository.saveAndFlush(savedDepartment);
+            return "Отдел " + args[0] + " успешно создан.\nРуководитель отдела - " + args[1];
+        }
+        return "Неверный ввод данных! Повторите попытку.";
     }
 
     public String renameDepartment(String args) {
@@ -74,20 +72,15 @@ public class DepartmentService {
         return "Неверный ввод данных! Повторите попытку.";
     }
 
-    public String deleteDepartment(String name, Scanner scanner) {
-        Optional<Department> departmentToDelete = departmentRepository.findByName(name.trim());
-        if (departmentToDelete.isPresent()) {
-            System.out.println("При удалении отдела все сотрудники этого отдела будут уволены!\n" +
-                    "Вы уверены что хотите удалить отдел " + name + "? (Yes/No)");
-            String userInput = scanner.nextLine();
-            if (userInput.trim().equalsIgnoreCase("Y") || userInput.trim().equalsIgnoreCase("YES")) {
-                int employeesDeleted = departmentToDelete.get().getEmployees().size();
-                departmentRepository.delete(departmentToDelete.get());
-                return "Отдел " + name.trim() + " удален. Также удалено " + employeesDeleted + " сотрудников!";
-            } else {
-                return "Отдел " + name.trim() + " не был удален";
-            }
-        }
-        return "Неверный ввод данных! Повторите попытку.";
+    public String deleteDepartment(String name) {
+        Department departmentToDelete = departmentRepository.findByName(name).get();
+        int employeesDeleted = departmentToDelete.getEmployees().size();
+        departmentRepository.delete(departmentToDelete);
+        return "Отдел " + name.trim() + " удален. Также удалено " + employeesDeleted + " сотрудников!";
+    }
+
+    public boolean departmentExists(String name) {
+        Optional<Department> departmentNameToCheck = departmentRepository.findByName(name.trim());
+        return  departmentNameToCheck.isPresent();
     }
 }
